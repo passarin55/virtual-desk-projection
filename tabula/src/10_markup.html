@@ -1,0 +1,208 @@
+<div id="app">
+  <header class="top">
+    <div class="mark">TABULA<b>-Ω</b><small>projected desk · operator bench</small></div>
+    <div class="chips" id="chips" aria-live="polite"></div>
+    <div class="acts">
+      <button class="btn primary" id="btnProject" type="button">Project here</button>
+      <button class="btn" id="btnProjWin" type="button">Projector window</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="desk" aria-selected="true" id="tab-desk">DESK<span>live surface · simulate</span></button>
+    <button role="tab" data-tab="scheme" aria-selected="false" id="tab-scheme">SCHEME<span>optics · mount · budget</span></button>
+    <button role="tab" data-tab="calib" aria-selected="false" id="tab-calib">CALIBRATE<span>warp · camera · touch</span></button>
+    <button role="tab" data-tab="funcs" aria-selected="false" id="tab-funcs">FUNCTIONS<span>apps · macros · MIDI</span></button>
+    <button role="tab" data-tab="tribunal" aria-selected="false" id="tab-tribunal">TRIBUNAL<span>8 critics · arm gate</span></button>
+    <button role="tab" data-tab="dossier" aria-selected="false" id="tab-dossier">DOSSIER<span>research · sources</span></button>
+    <button role="tab" data-tab="link" aria-selected="false" id="tab-link">LINK<span>host · sensors · windows</span></button>
+  </nav>
+
+  <main class="stage">
+    <!-- ================= DESK ================= -->
+    <section class="tab" data-panel="desk" role="tabpanel" aria-labelledby="tab-desk">
+      <div class="deskbar">
+        <div class="seg" id="wsSeg" role="group" aria-label="Workspace"></div>
+        <label class="f" style="min-width:210px">Simulated focused app<select id="simFocus"></select></label>
+        <div class="tray" id="tray" aria-label="Drop physical objects onto the desk">
+          <button type="button" data-obj="mug">+ mug</button><button type="button" data-obj="phone">+ phone</button><button type="button" data-obj="notebook">+ notebook</button><button type="button" data-obj="clear">clear objects</button>
+        </div>
+      </div>
+      <div class="deskwrap" id="deskWrap"><canvas id="deskView" width="1600" height="900" aria-label="Desk surface. Click to touch."></canvas></div>
+      <div class="row">
+        <label class="chk"><input type="checkbox" id="optGrid">mm grid</label>
+        <label class="chk"><input type="checkbox" id="optHand" checked>show sim hand</label>
+        <label class="chk"><input type="checkbox" id="optKb" checked>keyboard mask</label>
+        <div class="seg" id="handSeg" role="group" aria-label="Handedness"><button type="button" data-h="right" aria-pressed="true">right-handed</button><button type="button" data-h="left" aria-pressed="false">left-handed</button></div>
+      </div>
+      <p class="hint">Click = finger. <kbd>Shift</kbd>-click pins a finger (click it again to lift) · <kbd>Alt</kbd>-drag = pinch · <kbd>Ctrl</kbd>/<kbd>⌘</kbd>-drag = two fingers · <kbd>Ctrl</kbd>+<kbd>Alt</kbd>-drag = three fingers · hold ≈0.6 s = long-press · drag objects to move them. A touchscreen or pen works too.</p>
+    </section>
+
+    <!-- ================= SCHEME ================= -->
+    <section class="tab" data-panel="scheme" role="tabpanel" aria-labelledby="tab-scheme" hidden>
+      <div class="panel">
+        <h2>RIG</h2>
+        <div class="grid3" id="schemeForm"></div>
+        <div class="row" style="margin-top:10px"><button class="btn" id="btnAspect" type="button">Use projector aspect for the desk</button><span class="muted small" id="aspectNote"></span></div>
+      </div>
+      <div class="grid2" id="schemeStats"></div>
+      <div class="panel"><h2>SIDE ELEVATION</h2><div class="scroll-x" id="svgSide"></div></div>
+      <div class="panel"><h2>PLAN</h2><div class="scroll-x" id="svgTop"></div></div>
+      <div class="panel"><h2>BILL OF MATERIALS · MOUNTING</h2><div class="scroll-x"><table class="t" id="bom"></table></div>
+        <h3 style="margin-top:14px">MOUNTING CHECKLIST</h3>
+        <ol class="small" id="checklist"></ol></div>
+    </section>
+
+    <!-- ================= CALIBRATE ================= -->
+    <section class="tab" data-panel="calib" role="tabpanel" aria-labelledby="tab-calib" hidden>
+      <div class="grid2">
+        <div class="panel">
+          <h2>OUTPUT · CORNER PIN</h2>
+          <p>Drag the four handles until the projected frame sits exactly on your desk area (turn on the mm grid). Arrow keys nudge the selected corner by 1 px, Shift×10.</p>
+          <div class="pin" id="pinWrap"><canvas id="pinView" width="960" height="540" tabindex="0" aria-label="Corner pin editor"></canvas></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="pinReset" type="button">Reset</button>
+            <label class="chk"><input type="checkbox" id="pinGrid">grid on desk</label>
+            <label class="chk"><input type="checkbox" id="pinFlipX">flip X</label>
+            <label class="chk"><input type="checkbox" id="pinFlipY">flip Y</label>
+            <label class="chk"><input type="checkbox" id="pinMesh">mesh 5×4</label>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>OUTPUT · LIGHT</h2>
+          <div class="grid2">
+            <label class="f">Projector resolution<select id="outRes"><option value="1920x1080">1920 × 1080</option><option value="3840x2160">3840 × 2160</option><option value="1280x800">1280 × 800</option><option value="1366x768">1366 × 768</option><option value="960x540">960 × 540</option></select></label>
+            <label class="f">Gain <input type="range" id="outGain" min="0.4" max="1" step="0.01"></label>
+            <label class="f">Edge feather <input type="range" id="outFeather" min="0" max="0.04" step="0.001"></label>
+            <label class="f">Surface tint R/G/B <span class="row"><input type="range" id="tintR" min="0.5" max="1" step="0.01" aria-label="red gain"><input type="range" id="tintG" min="0.5" max="1" step="0.01" aria-label="green gain"><input type="range" id="tintB" min="0.5" max="1" step="0.01" aria-label="blue gain"></span></label>
+          </div>
+          <div class="row" style="margin-top:8px"><label class="chk"><input type="checkbox" id="optDim">dim light on hands</label><label class="chk"><input type="checkbox" id="optHead">head guard</label></div>
+          <p class="small muted" style="margin-top:8px">Tint compensates a coloured desk: lower the channels your surface over-reflects (a warm wood desk → lower red).</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>CAMERA ↔ DESK · GRAY CODE</h2>
+          <p>Projects black, white and bit-plane stripes (each with its inverse), decodes every camera pixel, fits a RANSAC homography. SIM CAM runs a synthetic tilted camera with lens distortion so you can see the solver work and score it against ground truth.</p>
+          <div class="grid3">
+            <label class="f">Camera<select id="gcSrc"><option value="sim">SIM CAM (synthetic)</option><option value="webcam">Webcam</option></select></label>
+            <label class="f">Stripe width<select id="gcStep"><option>8</option><option>12</option><option selected>16</option><option>24</option><option>32</option></select></label>
+            <label class="f">Settle (ms)<input type="number" id="gcSettle" min="40" max="800" step="10"></label>
+          </div>
+          <div class="row" style="margin-top:10px"><button class="btn primary" id="gcRun" type="button">Run Gray-code</button><button class="btn" id="gcCancel" type="button">Cancel</button></div>
+          <div class="progress" style="margin-top:10px"><i id="gcProg"></i></div>
+          <dl class="kv" id="gcStats" style="margin-top:10px"></dl>
+          <canvas class="viz" id="gcViz" width="320" height="180" aria-label="Decoded stripe map"></canvas>
+        </div>
+        <div class="panel">
+          <h2>TOUCH ACCURACY</h2>
+          <p>Nine rings appear on the desk; tap each centre with the input you use (finger on depth, AIR pinch, mouse). The mean offset is removed automatically and the remaining spread sets the safe target size.</p>
+          <div class="row"><label class="f" style="width:110px">Rounds<select id="accRounds"><option>1</option><option selected>2</option><option>3</option></select></label><button class="btn primary" id="accRun" type="button">Start test</button><button class="btn" id="accStop" type="button">Stop</button></div>
+          <dl class="kv" id="accStats" style="margin-top:10px"></dl>
+          <h2 style="margin-top:18px">LATENCY PROBE</h2>
+          <p>Flashes a square and times how long the (calibrated) webcam takes to see it: render + projector lag + camera.</p>
+          <div class="row"><button class="btn" id="latRun" type="button">Measure</button><span class="mono" id="latOut"></span></div>
+          <h2 style="margin-top:18px">AIR INPUT · WEBCAM HANDS</h2>
+          <p>MediaPipe Hand Landmarker in the browser. A single RGB camera cannot see contact, so pressing is a pinch (or a dwell). Needs the camera calibration above.</p>
+          <div class="row"><button class="btn" id="airRun" type="button">Start AIR</button><div class="seg" id="airSeg"><button type="button" data-m="pinch" aria-pressed="true">pinch</button><button type="button" data-m="dwell" aria-pressed="false">dwell</button></div><span class="small muted" id="airOut"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FUNCTIONS ================= -->
+    <section class="tab" data-panel="funcs" role="tabpanel" aria-labelledby="tab-funcs" hidden>
+      <div class="panel"><h2>FUNCTION CATALOGUE</h2><div class="scroll-x"><table class="t" id="catalog"></table></div></div>
+      <div class="grid2">
+        <div class="panel"><h2>APP PALETTES</h2><p>The palette follows the focused window. Pick a profile to inspect its shortcuts for the host OS.</p>
+          <label class="f">Profile<select id="profSel"></select></label>
+          <div class="scroll-x" style="margin-top:10px"><table class="t" id="profTable"></table></div></div>
+        <div class="panel"><h2>MIDI</h2><p>Faders send CC, pads send notes, transport sends CC 102–104. Route to any port: loopMIDI (Windows), IAC (macOS), ALSA virtual (Linux) — then MIDI-learn in your DAW.</p>
+          <div class="grid2">
+            <label class="f">Output port<select id="midiOut"><option value="">— enable Web MIDI —</option></select></label>
+            <label class="f">Channel<input type="number" id="midiCh" min="1" max="16"></label>
+            <label class="f">Fader CCs<input id="midiCC" spellcheck="false"></label>
+            <label class="f">Pad notes<input id="midiNotes" spellcheck="false"></label>
+          </div>
+          <div class="row" style="margin-top:10px"><button class="btn" id="midiEnable" type="button">Enable Web MIDI</button><button class="btn" id="midiTest" type="button">Send test note</button></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h2>MACRO DECK</h2><p>Steps: <code>key</code> (chord or {win,mac,linux}), <code>text</code>, <code>wait</code>, <code>media</code>, <code>launch</code>/<code>run</code> (host allow-list ids), <code>url</code>, <code>obs</code>, <code>ws</code>, <code>tool</code>, <code>timer</code>.</p>
+          <textarea class="code" id="macroJson" spellcheck="false" aria-label="Macros JSON"></textarea>
+          <div class="row" style="margin-top:8px"><button class="btn primary" id="macroApply" type="button">Apply macros</button><button class="btn" id="macroReset" type="button">Restore defaults</button><span class="small" id="macroMsg"></span></div></div>
+        <div class="panel"><h2>YOUR APP PROFILES</h2><p>Add palettes for any program. Matched before the built-ins by executable name or title regex.</p>
+          <textarea class="code" id="userProfJson" spellcheck="false" aria-label="User profiles JSON"></textarea>
+          <div class="row" style="margin-top:8px"><button class="btn primary" id="userProfApply" type="button">Apply profiles</button><button class="btn" id="userProfExample" type="button">Insert example</button><span class="small" id="userProfMsg"></span></div></div>
+      </div>
+      <div class="panel"><h2>CONFIGURATION</h2><p>Everything above (calibration included) is one JSON document. Copy it to keep it; paste one to restore.</p>
+        <textarea class="code" id="cfgJson" spellcheck="false" style="min-height:140px" aria-label="Configuration JSON"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn" id="cfgCopy" type="button">Copy</button><button class="btn" id="cfgLoad" type="button">Load pasted</button><button class="btn" id="cfgDownload" type="button" hidden>Download</button><button class="btn danger" id="cfgFactory" type="button">Factory reset</button><span class="small" id="cfgMsg"></span></div></div>
+    </section>
+
+    <!-- ================= TRIBUNAL ================= -->
+    <section class="tab" data-panel="tribunal" role="tabpanel" aria-labelledby="tab-tribunal" hidden>
+      <div class="panel">
+        <div class="gate"><div class="state" id="gateState">—</div><div class="muted" id="gateWhy"></div></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" id="btnArm" type="button">Arm OS injection</button>
+          <button class="btn danger" id="btnPanic" type="button">Panic · release all</button>
+          <label class="chk"><input type="checkbox" id="optStrict">unanimous (every WARN must be acknowledged)</label>
+          <button class="btn" id="btnRerun" type="button">Re-run critics</button>
+        </div>
+      </div>
+      <div class="grid2" id="critics"></div>
+    </section>
+
+    <!-- ================= DOSSIER ================= -->
+    <section class="tab" data-panel="dossier" role="tabpanel" aria-labelledby="tab-dossier" hidden>
+      <div class="panel"><h2>LINEAGE</h2><p>Thirty-five years of projector–camera desks, and the one thing TABULA takes from each.</p></div>
+      <div class="lineage" id="lineage"></div>
+      <div class="grid2">
+        <div class="panel"><h2>NUMBERS THAT SET THE DESIGN</h2><div class="scroll-x"><table class="t" id="numbers"></table></div></div>
+        <div class="panel"><h2>DECISIONS</h2><div class="scroll-x"><table class="t" id="decisions"></table></div>
+          <h2 style="margin-top:16px">PRODUCTS</h2><div class="scroll-x"><table class="t" id="products"></table></div></div>
+      </div>
+      <div class="panel"><h2>SOURCES</h2><ol class="src" id="sources"></ol></div>
+    </section>
+
+    <!-- ================= LINK ================= -->
+    <section class="tab" data-panel="link" role="tabpanel" aria-labelledby="tab-link" hidden>
+      <div class="grid2">
+        <div class="panel"><h2>HOST</h2>
+          <div class="seg" id="hostSeg" role="group" aria-label="Host mode"><button type="button" data-m="sim" aria-pressed="true">SIMULATED</button><button type="button" data-m="live" aria-pressed="false">LIVE</button><button type="button" data-m="off" aria-pressed="false">OFF</button></div>
+          <div class="grid2" style="margin-top:10px"><label class="f">WebSocket URL<input id="hostUrl" spellcheck="false" placeholder="ws://127.0.0.1:7777/ws"></label><label class="f">Token<input id="hostTok" spellcheck="false" autocomplete="off" placeholder="the #t=… part of the link the host printed"></label></div>
+          <dl class="kv" id="hostStats" style="margin-top:10px"></dl>
+        </div>
+        <div class="panel"><h2>RUN THE HOST</h2>
+          <p>The host injects keys, mouse and touch into your OS, reads the focused window, streams windows into the PORTAL and runs the depth-touch engine. It serves this page at 127.0.0.1 and opens it with a per-run token in the link (<code>…/#t=…</code>): the fragment never reaches a server or a log, and the page itself never contains it. On another device (LAN mode) open the LAN link the host prints, or paste the token here. This page opened from disk connects only after <code>"allow_file_origin": true</code> in <code>~/.tabula/config.json</code>.</p>
+          <pre class="cmd">pip install websockets numpy opencv-contrib-python psutil "mss>=10" pillow
+python tabula_host.py                     # safe: starts disarmed
+python tabula_host.py --dry-run --sense synthetic   # try everything, inject nothing
+python tabula_host.py --sense realsense   # or orbbec · k4a · freenect2 · lightplane:1
+python tabula_host.py --print-tokens tokens.svg     # ArUco MIP 36h12 tokens</pre>
+          <p class="small muted">Optional per-OS extras: Windows <code>pycaw dxcam</code> · Linux <code>evdev</code> (+ uinput access) · macOS <code>pyobjc-framework-Quartz</code> · MIDI <code>mido python-rtmidi</code>.</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h2>HOST SENSING</h2>
+          <div class="grid2"><label class="f">Source<select id="senseSrc"><option value="synthetic">synthetic (test arms)</option><option value="realsense">RealSense</option><option value="orbbec">Orbbec (pyorbbecsdk2)</option><option value="k4a">Azure Kinect / Femto (pyk4a)</option><option value="freenect2">Kinect v2</option><option value="lightplane:0">IR light plane · camera 0</option></select></label>
+          <label class="f">Tangibles camera<input id="tangCam" type="number" min="-1" max="9" value="-1"></label></div>
+          <div class="row" style="margin-top:10px"><button class="btn" id="senseStart" type="button">Start</button><button class="btn" id="senseStop" type="button">Stop</button><button class="btn" id="senseBg" type="button">Re-learn background</button><button class="btn" id="senseTap" type="button">Tap-calibrate sensor → desk</button><button class="btn" id="senseGc" type="button">Gray-code the host camera</button></div>
+          <dl class="kv" id="senseStats" style="margin-top:10px"></dl></div>
+        <div class="panel"><h2>WINDOWS &amp; SCREENS</h2>
+          <p>Open a second window for the projector; the console then mirrors it and forwards your clicks. With the Window Management API the projector window can go fullscreen on the projector's screen directly.</p>
+          <div class="row"><button class="btn" id="btnScreens" type="button">Detect screens</button></div>
+          <dl class="kv" id="peerStats" style="margin-top:10px"></dl></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="inspector" aria-label="Inspector">
+    <div class="panel"><h3>CONTACTS</h3><div class="mono small" id="contactList">—</div></div>
+    <div class="log" id="log" aria-live="polite"></div>
+  </aside>
+</div>
+<div class="toasts" id="toasts"></div>
+<canvas id="projOut" aria-label="Projector output"></canvas>
+<canvas id="projOverlay" aria-hidden="true"></canvas>
+<div id="projHud"></div>
